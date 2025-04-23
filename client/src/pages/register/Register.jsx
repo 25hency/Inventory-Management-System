@@ -41,7 +41,7 @@ const Register = () => {
     return (
         <div className="form">
             <img src={logo} alt="logo" className="brand-logo-lg" />
-            <h2>Welcome to Smart Inventory Management System</h2>
+            <h2>Welcome to Inventory Management System</h2>
             <p>Register Account</p>
             <div className="form-group">
                 <Form layout="vertical" onFinish={handlerSubmit}>
@@ -64,7 +64,6 @@ const Register = () => {
                     </div>
                 </Form>
             </div>
-            <small>Powered by Binary Brigade</small>
         </div>
     );
 };

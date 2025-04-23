@@ -18,9 +18,17 @@ export const rootReducer = (state = initialState, action) => {
         case 'ADD_TO_CART':
             const existingItem = state.cartItems.find(item => item._id === action.payload._id);
             if (existingItem) {
+                // Check if adding one more would exceed stock
+                if (existingItem.quantity >= existingItem.stock) {
+                    return state;
+                }
                 return {
                     ...state,
-                    cartItems: state.cartItems.map(item => (item._id === action.payload._id ? { ...item, quantity: item.quantity + 1 } : item)),
+                    cartItems: state.cartItems.map(item => 
+                        item._id === action.payload._id 
+                        ? { ...item, quantity: Math.min(item.quantity + 1, item.stock) }
+                        : item
+                    ),
                 };
             }
             return {
@@ -30,7 +38,11 @@ export const rootReducer = (state = initialState, action) => {
         case 'UPDATE_CART':
             return {
                 ...state,
-                cartItems: state.cartItems.map(product => (product._id === action.payload._id ? { ...product, quantity: action.payload.quantity } : product)),
+                cartItems: state.cartItems.map(item => 
+                    item._id === action.payload._id 
+                    ? { ...item, quantity: Math.min(action.payload.quantity, item.stock) }
+                    : item
+                ),
             };
         case 'DELETE_FROM_CART':
             return {

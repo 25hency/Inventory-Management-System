@@ -7,16 +7,6 @@ import { useReactToPrint } from 'react-to-print';
 import Layout from '../../components/Layout';
 
 const Bills = () => {
-    const [userId, setUserId] = useState(() => {
-        const auth = localStorage.getItem('auth');
-        return auth ? JSON.parse(auth)._id : null;
-    });
-    useEffect(() => {
-        const auth = localStorage.getItem('auth');
-        if (auth) {
-            setUserId(JSON.parse(auth)._id);
-        }
-    }, []);
     const componentRef = useRef();
     const dispatch = useDispatch();
     const [billsData, setBillsData] = useState([]);
@@ -25,15 +15,10 @@ const Bills = () => {
 
     const getAllBills = async () => {
         try {
-            if (!userId) {
-                return;
-            }
             dispatch({
                 type: 'SHOW_LOADING',
             });
-            const { data } = await axios.get('/api/bills/getbills', {
-                params: { createdBy: userId }
-            });
+            const { data } = await axios.get('/api/bills/getbills');
             setBillsData(data);
             dispatch({
                 type: 'HIDE_LOADING',
@@ -49,7 +34,7 @@ const Bills = () => {
 
     useEffect(() => {
         getAllBills();
-    }, [userId]);
+    }, []);
 
     const columns = [
         {
@@ -63,6 +48,7 @@ const Bills = () => {
         {
             title: 'Contact Number',
             dataIndex: 'customerPhone',
+            render: phone => <span>+91 {phone}</span>,
         },
         {
             title: 'Customer Address',
@@ -71,14 +57,17 @@ const Bills = () => {
         {
             title: 'Sub Total',
             dataIndex: 'subTotal',
+            render: subTotal => <span>₹{subTotal}</span>
         },
         {
             title: 'Tax',
             dataIndex: 'tax',
+            render: tax => <span>₹{tax}</span>
         },
         {
             title: 'Total Amount',
             dataIndex: 'totalAmount',
+            render: total => <span>₹{total}</span>
         },
         {
             title: 'Action',
@@ -110,13 +99,7 @@ const Bills = () => {
                 <Modal title="Invoice Details" width={400} pagination={false} visible={popModal} onCancel={() => setPopModal(false)} footer={false}>
                     <div className="card" ref={componentRef}>
                         <div className="cardHeader">
-                            <h2 className="logo">MP POS</h2>
-                            <span>
-                                Number: <b>+381/0000000</b>
-                            </span>
-                            <span>
-                                Address: <b>34000 Kragujevac, Serbia</b>
-                            </span>
+                            <h2 className="logo">Home System</h2>
                         </div>
                         <div className="cardBody">
                             <div className="group">
@@ -128,7 +111,7 @@ const Bills = () => {
                             <div className="group">
                                 <span>Customer Phone:</span>
                                 <span>
-                                    <b>{selectedBill.customerPhone}</b>
+                                    <b>+91 {selectedBill.customerPhone}</b>
                                 </span>
                             </div>
                             <div className="group">
@@ -146,7 +129,7 @@ const Bills = () => {
                             <div className="group">
                                 <span>Total Amount:</span>
                                 <span>
-                                    <b>${selectedBill.totalAmount}</b>
+                                    <b>₹{selectedBill.totalAmount}</b>
                                 </span>
                             </div>
                         </div>
@@ -170,7 +153,7 @@ const Bills = () => {
                                         <div className="group">
                                             <span>Price:</span>
                                             <span>
-                                                <b>${product.price}</b>
+                                                <b>₹{product.price}</b>
                                             </span>
                                         </div>
                                     </div>
@@ -180,7 +163,7 @@ const Bills = () => {
                                 <div className="group">
                                     <h3>Total:</h3>
                                     <h3>
-                                        <b>${selectedBill.totalAmount}</b>
+                                        <b>₹{selectedBill.totalAmount}</b>
                                     </h3>
                                 </div>
                             </div>

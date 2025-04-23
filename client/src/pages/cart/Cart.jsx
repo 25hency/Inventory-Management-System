@@ -31,6 +31,10 @@ const Cart = () => {
     const { cartItems } = useSelector(state => state.rootReducer);
 
     const handlerIncrement = record => {
+        if (record.quantity >= record.stock) {
+            message.warning(`Cannot add more than available stock (${record.stock} items)`);
+            return;
+        }
         dispatch({
             type: 'UPDATE_CART',
             payload: { ...record, quantity: record.quantity + 1 },
@@ -66,7 +70,7 @@ const Cart = () => {
         {
             title: 'Price',
             dataIndex: 'price',
-            render: price => <strong>{price}৳</strong>,
+            render: price => <strong>₹{price}</strong>,
         },
         {
             title: 'Stock',
@@ -196,7 +200,7 @@ const Cart = () => {
                     <Table dataSource={cartItems} columns={columns} bordered />
                     <div className="subTotal">
                         <h2>
-                            Sub Total: <span>{subTotal.toFixed(2)}৳</span>
+                            Sub Total: <span>₹{subTotal.toFixed(2)}</span>
                         </h2>
                         <Button onClick={() => setBillPopUp(true)} className="add-new">
                             Generate Invoice
@@ -207,7 +211,7 @@ const Cart = () => {
                             {/* find customer by number or create new customer */}
                             <FormItem name="phone" label="Customer Phone" rules={[{ required: true, message: 'Please enter phone number' }]}>
                                 <Input
-                                    prefix="+880"
+                                    prefix="+91"
                                     onBlur={async e => {
                                         const phone = e.target.value.replace(/\D/g, '');
                                         if (phone && userId) {
@@ -253,10 +257,10 @@ const Cart = () => {
                                 </Select>
                             </Form.Item>
                             <div className="total">
-                                <span>SubTotal: {subTotal.toFixed(2)}৳</span>
+                                <span>SubTotal: ₹{subTotal.toFixed(2)}</span>
                                 <br />
-                                <span>Tax: {((subTotal / 100) * 5).toFixed(2)}৳</span>
-                                <h3>Total: {(Number(subTotal) + Number(((subTotal / 100) * 5).toFixed(2))).toFixed(2)}৳</h3>
+                                <span>Tax: ₹{((subTotal / 100) * 5).toFixed(2)}</span>
+                                <h3>Total: ₹{(Number(subTotal) + Number(((subTotal / 100) * 5).toFixed(2))).toFixed(2)}</h3>
                             </div>
                             <div className="form-btn-add">
                                 <Button htmlType="submit" className="add-new">

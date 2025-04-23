@@ -11,8 +11,8 @@ const billsSchema = new mongoose.Schema(
         tax: { type: Number, required: true },
         paymentMethod: { type: String, required: true },
         cartItems: { type: Array, required: true },
-        createdBy: { type: String, required: true },
-        customerId: { type: String, required: true },
+        createdBy: { type: String },
+        customerId: { type: String }
     },
     {
         //for date

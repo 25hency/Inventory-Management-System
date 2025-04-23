@@ -4,11 +4,9 @@ import products from '../utils/data.js';
 // get products
 export const getProductController = async (req, res) => {
     try {
-        const { createdBy, search } = req.query;
+        const { search } = req.query;
+        const query = {};
         
-        const query = { createdBy };
-        
-        // Add name search if search parameter exists
         if (search) {
             query.name = { $regex: search, $options: 'i' };
         }
@@ -17,6 +15,7 @@ export const getProductController = async (req, res) => {
         res.status(200).send(products);
     } catch (error) {
         console.log(error);
+        res.status(500).send('Error fetching products');
     }
 };
 

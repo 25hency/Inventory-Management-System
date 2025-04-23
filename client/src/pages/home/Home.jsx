@@ -1,116 +1,130 @@
-import { Col, Empty, Row } from 'antd';
+import { Empty, Row, Col, Card } from 'antd';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import LayoutApp from '../../components/Layout';
 import Product from '../../components/Product';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
 import './home.css';
 
-import allCategories from '../../asset/images/all-cat.png';
-
 const Home = () => {
-    const [userId, setUserId] = useState(() => {
-        const auth = localStorage.getItem('auth');
-        return auth ? JSON.parse(auth)._id : null;
+    const dispatch = useDispatch();
+    const [productData, setProductData] = useState([]);
+    const [analyticsData, setAnalyticsData] = useState({
+        categoryDistribution: [],
+        topProducts: []
     });
 
-    useEffect(() => {
-        const auth = localStorage.getItem('auth');
-        if (auth) {
-            setUserId(JSON.parse(auth)._id);
+    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+
+    const getAllProducts = async () => {
+        try {
+            dispatch({ type: 'SHOW_LOADING' });
+            const { data } = await axios.get('/api/products/getproducts');
+            setProductData(data);
+            dispatch({ type: 'HIDE_LOADING' });
+        } catch (error) {
+            console.log(error);
+            dispatch({ type: 'HIDE_LOADING' });
         }
-    }, []);
-    const dispatch = useDispatch();
+    };
 
-    const [productData, setProductData] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('all');
-    const categories = [
-        {
-            name: 'all',
-            imageUrl: allCategories,
-        },
-        {
-            name: 'pizzas',
-            imageUrl: 'https://creazilla-store.fra1.digitaloceanspaces.com/cliparts/27954/pizza-pepperoni-clipart-xl.png',
-        },
-        {
-            name: 'burgers',
-            imageUrl: 'https://cdn.pixabay.com/photo/2022/01/04/23/00/fast-food-6916101_960_720.png',
-        },
-        {
-            name: 'drinks',
-            imageUrl: 'https://images.vexels.com/media/users/3/246333/isolated/preview/9626dce3278f72220ea2736de64e6233-pink-cocktail-color-stroke.png',
-        },
-    ];
+    const fetchAnalyticsData = async () => {
+        try {
+            const { data } = await axios.get('/api/analytics/inventory-analytics');
+            
+            const categoryData = data.stockByCategory.map(item => ({
+                name: item._id || 'Uncategorized',
+                value: item.totalStock
+            }));
+
+            const topProductsData = data.topSellingProducts.map(item => ({
+                name: item.productName,
+                sales: item.totalQuantity
+            }));
+
+            setAnalyticsData({
+                categoryDistribution: categoryData,
+                topProducts: topProductsData
+            });
+        } catch (error) {
+            console.error('Error fetching analytics:', error);
+        }
+    };
 
     useEffect(() => {
-        const getAllProducts = async () => {
-            try {
-                dispatch({
-                    type: 'SHOW_LOADING',
-                });
-                const { data } = await axios.get(`/api/products/getproducts?createdBy=${userId}`);
-                setProductData(data);
-                dispatch({
-                    type: 'HIDE_LOADING',
-                });
-                console.log(data);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
         getAllProducts();
-    }, [dispatch, userId]); // Added userId as a dependency
+        fetchAnalyticsData();
+    }, []);
 
     return (
         <LayoutApp>
-            <div>
-                <h2>POS System</h2>
-            </div>
+            <h2>Product Catalog</h2>
             {productData.length === 0 ? (
                 <div className="no-product">
                     <h3 className="no-product-text">No Product Found</h3>
                     <Empty />
                 </div>
             ) : (
-                <div>
-                    <div className="category">
-                        {categories?.map(category => (
-                            <div
-                                key={category.name}
-                                className={`categoryFlex ${selectedCategory === category.name && 'category-active'}`}
-                                onClick={() => setSelectedCategory(category.name)}
-                            >
-                                <h3 className="categoryName">{category.name}</h3>
-                                <img src={category.imageUrl} alt={category.name} height={60} width={60} />
-                            </div>
-                        ))}
-                    </div>
-                    <Row>
-                        {selectedCategory === 'all' ? (
-                            productData?.map(product => (
+                <>
+                    <div>
+                        <Row>
+                            {productData?.map(product => (
                                 <Col xs={24} sm={6} md={6} lg={6} key={product._id}>
-                                    <Product key={product._id} product={product} />
+                                    <Product product={product} />
                                 </Col>
-                            ))
-                        ) : productData?.filter(i => i.category === selectedCategory).length > 0 ? (
-                            productData
-                                ?.filter(i => i.category === selectedCategory)
-                                .map(product => (
-                                    <Col xs={24} sm={6} md={6} lg={6} key={product._id}>
-                                        <Product key={product._id} product={product} />
-                                    </Col>
-                                ))
-                        ) : (
-                            <Col xs={24} sm={24} md={24} lg={24}>
-                                <div className="empty-container">
-                                    <Empty description={<span>No Product Found</span>} />
-                                </div>
+                            ))}
+                        </Row>
+                    </div>
+
+                    <div className="analytics-section">
+                        <h2>Inventory Analytics</h2>
+                        <Row gutter={[16, 16]}>
+                            <Col xs={24} md={12}>
+                                <Card title="Category Distribution">
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <PieChart>
+                                            <Pie
+                                                data={analyticsData.categoryDistribution}
+                                                cx="50%"
+                                                cy="50%"
+                                                labelLine={false}
+                                                outerRadius={80}
+                                                fill="#8884d8"
+                                                dataKey="value"
+                                                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                            >
+                                                {analyticsData.categoryDistribution.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip />
+                                            <Legend />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </Card>
                             </Col>
-                        )}
-                    </Row>
-                </div>
+                            <Col xs={24} md={12}>
+                                <Card title="Top Selling Products">
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <BarChart data={analyticsData.topProducts}>
+                                            <CartesianGrid strokeDasharray="3 3" />
+                                            <XAxis dataKey="name" />
+                                            <YAxis />
+                                            <Tooltip />
+                                            <Legend />
+                                            <Bar dataKey="sales">
+                                                {analyticsData.topProducts.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </Card>
+                            </Col>
+                        </Row>
+                    </div>
+                </>
             )}
         </LayoutApp>
     );

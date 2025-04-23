@@ -3,3 +3,83 @@
     margin: 0 auto;
     color: #ff7f50;
 }
+
+.analytics-section {
+    margin-bottom: 2rem;
+    margin-top: 3rem;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.analytics-section h2 {
+    color: #001e28;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.mt-4 {
+    margin-top: 1.5rem;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+/* Card hover effects */
+.ant-card {
+    transition: all 0.3s ease;
+}
+
+.ant-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 30, 40, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Statistics styling */
+.ant-statistic-title {
+    color: #666;
+    font-size: 14px;
+}
+
+.ant-statistic-content {
+    color: #001e28;
+}
+
+/* Progress bar customization */
+.ant-progress-bg {
+    background: #001e28;
+}
+
+.recharts-wrapper {
+    margin: 0 auto;
+}
+
+.recharts-default-tooltip {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid #001e28 !important;
+    border-radius: 4px;
+    padding: 8px !important;
+}
+
+.recharts-tooltip-label {
+    color: #001e28 !important;
+    font-weight: 500;
+}
+
+.recharts-legend-item-text {
+    color: #666 !important;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .analytics-section {
+        padding: 15px;
+        margin-top: 2rem;
+    }
+    
+    .recharts-wrapper {
+        font-size: 12px;
+    }
+}

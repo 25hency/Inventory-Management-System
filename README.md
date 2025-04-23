@@ -1,129 +1,146 @@
-# POS SYSTEM
+# Smart Inventory Management System
 
-## Modern Point of Sale System Built with MERN Stack
+A comprehensive solution for businesses to manage inventory, track sales, and analyze data. This system provides an intuitive interface for product management, customer tracking, and sales reporting.
 
-A comprehensive Inventory Management System (IMS) and Point of Sale (POS) system built using the MERN (MongoDB, Express.js, React.js, Node.js) stack. This system provides a robust solution for managing sales, inventory, customers, and generating invoices.
+## Features
 
-## 🚀 Features
+- 📦 Product inventory management with stock tracking
+- 🛒 Cart functionality for creating orders
+- 🧾 Invoice generation and printing
+- 👥 Customer management system
+- 📊 Analytics and reporting dashboard
+- 👤 User authentication and management
+- 📱 Responsive UI for all device sizes
 
-### Product Management
+## Tech Stack
 
--   Add, edit, and delete products
--   Real-time product search functionality
--   Stock tracking with low stock alerts
--   Product categorization
--   Image support for products
+### Frontend
+- React.js
+- Redux for state management
+- Ant Design for UI components
+- Recharts for data visualization
+- React Router for navigation
 
-### Cart & Sales
+### Backend
+- Node.js
+- Express.js
+- MongoDB for database
+- Mongoose for ODM
 
--   Intuitive cart interface
--   Smart quantity management (auto-increment for duplicate items)
--   Real-time price calculation
--   Easy product addition and removal
--   Quick checkout process
+## Screenshots
 
-### Customer Management
+*Screenshots will go here*
 
--   Customer database with search functionality
--   Phone number formatting with "+880" prefix
--   Partial phone number search support
--   Customer history tracking
--   Address management
+## Installation
 
-### Invoice Generation
-
--   Professional invoice generation
--   Automatic invoice numbering
--   Customer details integration
--   Itemized bill generation
--   Print-ready format
-
-### User Interface
-
--   Modern, responsive design
--   Real-time search capabilities
--   Intuitive navigation
--   User-friendly forms
--   Clear feedback messages
-
-## 🛠 Technology Stack
-
--   **Frontend**: React.js, Ant Design, Redux
--   **Backend**: Node.js, Express.js
--   **Database**: MongoDB
--   **Authentication**: JWT
--   **API**: RESTful architecture
-
-## 🚀 Getting Started
+Follow these steps to set up the project on your local machine:
 
 ### Prerequisites
+- Node.js (v14 or higher)
+- MongoDB (local or Atlas connection)
 
--   Node.js (v14 or higher)
--   MongoDB
--   npm or yarn
+### Setup
 
-### Installation Steps
-
-1. Clone the repository:
-
+1. Clone the repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/25hency/Inventory-Management-System.git
+cd smart-inventory-management-system
 ```
 
-2. Install server dependencies:
-
+2. Install dependencies for server
 ```bash
 npm install
 ```
 
-3. Install client dependencies:
-
+3. Install dependencies for client
 ```bash
 cd client
 npm install
+cd ..
 ```
 
-4. Create .env file in root directory with:
-
-```env
+4. Create a `.env` file in the root directory with the following variables:
+```
 MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-PORT=8080
+PORT=5000
 ```
 
-5. Start the development servers:
-
-For backend:
-
+5. Run the application
 ```bash
+# Run both frontend and backend
+npm run dev
+
+# Run backend only
 npm run server
+
+# Run frontend only
+npm run client
 ```
 
-For frontend:
+## Project Structure
 
+```
+smart-inventory-management-system/
+├── client/                 # React frontend
+│   ├── public/             # Static files
+│   └── src/                # Source files
+│       ├── components/     # React components
+│       ├── pages/          # Page components
+│       ├── redux/          # Redux store
+│       └── assets/         # Images and other assets
+├── controllers/            # API controllers
+├── models/                 # Mongoose models
+├── routes/                 # API routes
+├── middleware/             # Custom middleware
+├── utils/                  # Utility functions
+└── tests/                  # Test files
+```
+
+## API Endpoints
+
+### Products API
+- `GET /api/products/getproducts` - Get all products
+- `POST /api/products/addproducts` - Add new product
+- `PUT /api/products/updateproducts` - Update product
+- `POST /api/products/deleteproducts` - Delete product
+- `POST /api/products/seeds` - Seed initial products
+
+### Users API
+- `POST /api/users/login` - User login
+- `POST /api/users/register` - User registration
+
+### Bills API
+- `GET /api/bills/getbills` - Get all bills
+- `POST /api/bills/addbills` - Create new bill
+
+### Customers API
+- `GET /api/customers/get-customers` - Get all customers
+- `GET /api/customers/get-customers-by-number` - Find customer by phone number
+- `POST /api/customers/add-customers` - Add new customer
+- `PUT /api/customers/update-customers` - Update customer
+- `POST /api/customers/delete-customers` - Delete customer
+
+### Analytics API
+- `GET /api/analytics/inventory-analytics` - Get inventory analytics
+
+## Testing
+
+The application includes E2E tests using Jest and Selenium WebDriver.
+
+To run tests:
 ```bash
-cd client
-npm start
+npm test
 ```
 
-## 📝 Usage
+To run E2E tests:
+```bash
+npm run test:e2e
+```
 
-1. Register/Login to access the dashboard
-2. Add products to your inventory
-3. Manage customers
-4. Create sales and generate invoices
-5. Track your business performance
+## Contributing
 
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
--   Ant Design for the UI components
--   MongoDB Atlas for database hosting
--   The MERN stack community
-
-## 📞 Support
-
-For support, please open an issue in the repository or contact the maintainers.
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request

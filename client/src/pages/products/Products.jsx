@@ -1,16 +1,22 @@
-import { DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Modal, Select, Table, message } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Alert, Button, Card, Col, Form, Input, Modal, Row, Select, Statistic, Table, message } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import LayoutApp from '../../components/Layout';
+import './products.css';
 
 const Products = () => {
+    const dispatch = useDispatch();
+    const [productData, setProductData] = useState([]);
+    const [popModal, setPopModal] = useState(false);
+    const [editProduct, setEditProduct] = useState(false);
     const [userId, setUserId] = useState(() => {
         const auth = localStorage.getItem('auth');
         return auth ? JSON.parse(auth)._id : null;
     });
+
     useEffect(() => {
         const auth = localStorage.getItem('auth');
         if (auth) {
@@ -18,23 +24,19 @@ const Products = () => {
         }
     }, []);
 
-    const dispatch = useDispatch();
-    const [productData, setProductData] = useState([]);
-    const [popModal, setPopModal] = useState(false);
-    const [editProduct, setEditProduct] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [analytics, setAnalytics] = useState({
+        lowStockItems: [],
+        inventoryStats: { totalProducts: 0, totalStock: 0, totalValue: 0 },
+        topSellingProducts: [],
+        stockByCategory: []
+    });
 
-    const getAllProducts = async (search = '') => {
+    const getAllProducts = async () => {
         try {
             dispatch({
                 type: 'SHOW_LOADING',
             });
-            const { data } = await axios.get('/api/products/getproducts', {
-                params: {
-                    createdBy: userId,
-                    search,
-                },
-            });
+            const { data } = await axios.get('/api/products/getproducts');
             setProductData(data);
             dispatch({
                 type: 'HIDE_LOADING',
@@ -47,18 +49,19 @@ const Products = () => {
         }
     };
 
+    const getAnalytics = async () => {
+        try {
+            const { data } = await axios.get('/api/analytics/inventory-analytics');
+            setAnalytics(data);
+        } catch (error) {
+            console.log('Analytics Error:', error);
+        }
+    };
+
     useEffect(() => {
         getAllProducts();
+        getAnalytics();
     }, []);
-
-    // Handle search with debounce
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            getAllProducts(searchQuery);
-        }, 300);
-
-        return () => clearTimeout(timer);
-    }, [searchQuery]);
 
     const handlerDelete = async record => {
         try {
@@ -94,7 +97,7 @@ const Products = () => {
         {
             title: 'Price',
             dataIndex: 'price',
-            render: price => <span>{price}৳</span>,
+            render: price => <span>₹{price}</span>,
         },
         {
             title: 'Stock',
@@ -176,26 +179,89 @@ const Products = () => {
 
     return (
         <LayoutApp>
+            <div className="analytics-section mb-4">
+                <Row gutter={[16, 16]} className="mt-4">
+                    <Col xs={24} sm={8}>
+                        <Card>
+                            <Statistic
+                                title="Total Products"
+                                value={analytics.inventoryStats.totalProducts}
+                                prefix="📦"
+                            />
+                        </Card>
+                    </Col>
+                    <Col xs={24} sm={8}>
+                        <Card>
+                            <Statistic
+                                title="Total Stock"
+                                value={analytics.inventoryStats.totalStock}
+                                prefix="🏭"
+                            />
+                        </Card>
+                    </Col>
+                    <Col xs={24} sm={8}>
+                        <Card>
+                            <Statistic
+                                title="Inventory Value"
+                                value={analytics.inventoryStats.totalValue}
+                                prefix="₹"
+                                precision={2}
+                            />
+                        </Card>
+                    </Col>
+                </Row>
+
+                <Row gutter={[16, 16]} className="mt-4">
+                    <Col xs={24} md={12}>
+                        <Card title="Low Stock Alerts">
+                            {analytics.lowStockItems.length > 0 ? (
+                                <Table
+                                    dataSource={analytics.lowStockItems}
+                                    columns={[
+                                        { title: 'Name', dataIndex: 'name' },
+                                        { 
+                                            title: 'Stock', 
+                                            dataIndex: 'stock',
+                                            render: stock => (
+                                                <span style={{ color: stock < 5 ? 'red' : 'orange' }}>{stock}</span>
+                                            )
+                                        }
+                                    ]}
+                                    pagination={false}
+                                    size="small"
+                                />
+                            ) : (
+                                <Alert message="No low stock items" type="success" showIcon />
+                            )}
+                        </Card>
+                    </Col>
+                    <Col xs={24} md={12}>
+                        <Card title="Top Selling Products">
+                            <Table
+                                dataSource={analytics.topSellingProducts}
+                                columns={[
+                                    { title: 'Product', dataIndex: 'productName' },
+                                    { title: 'Total Sold', dataIndex: 'totalQuantity' }
+                                ]}
+                                pagination={false}
+                                size="small"
+                            />
+                        </Card>
+                    </Col>
+                </Row>
+            </div>
+
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2>All Products</h2>
-                <div className="d-flex gap-3">
-                    <Input
-                        placeholder="Search by product name"
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                        style={{ width: '200px' }}
-                        suffix={<SearchOutlined />}
-                    />
-                    <Button
-                        className="add-new"
-                        onClick={() => {
-                            setEditProduct(null);
-                            setPopModal(true);
-                        }}
-                    >
-                        Add Product
-                    </Button>
-                </div>
+                <Button
+                    className="add-new"
+                    onClick={() => {
+                        setEditProduct(null);
+                        setPopModal(true);
+                    }}
+                >
+                    Add Product
+                </Button>
             </div>
 
             <Table
@@ -204,7 +270,7 @@ const Products = () => {
                 bordered
                 pagination={false}
                 locale={{
-                    emptyText: searchQuery ? 'No matching products found' : 'No products available',
+                    emptyText: 'No products available',
                 }}
             />
 
@@ -222,13 +288,9 @@ const Products = () => {
                         <FormItem name="name" label="Name">
                             <Input />
                         </FormItem>
-                        <Form.Item name="category" label="Category">
-                            <Select>
-                                <Select.Option value="pizzas">Pizzas</Select.Option>
-                                <Select.Option value="burgers">Burgers</Select.Option>
-                                <Select.Option value="drinks">Drinks</Select.Option>
-                            </Select>
-                        </Form.Item>
+                        <FormItem name="category" label="Category">
+                            <Input />
+                        </FormItem>
                         <FormItem name="price" label="Price">
                             <Input />
                         </FormItem>
