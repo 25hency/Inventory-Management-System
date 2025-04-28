@@ -18,6 +18,16 @@ const Customers = () => {
     const [searchPhone, setSearchPhone] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [form] = Form.useForm();
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 576);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         const auth = localStorage.getItem('auth');
@@ -164,11 +174,13 @@ const Customers = () => {
         {
             title: 'Customer Address',
             dataIndex: 'address',
+            responsive: ['md'],
         },
         {
             title: 'Created On',
             dataIndex: 'createdAt',
             render: createdAt => new Date(createdAt).toLocaleDateString(),
+            responsive: ['lg'],
         },
         {
             title: 'Actions',
@@ -183,14 +195,14 @@ const Customers = () => {
 
     return (
         <Layout>
-            <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="d-flex justify-content-between align-items-center mb-4" style={{ flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '10px' : '0' }}>
                 <h2>All Customers</h2>
-                <div className="d-flex gap-3">
+                <div className="d-flex gap-3" style={{ flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto' }}>
                     <Input
                         placeholder="Search by phone number"
                         value={searchPhone}
                         onChange={handlePhoneInput}
-                        style={{ width: '200px' }}
+                        style={{ width: isMobile ? '100%' : '200px' }}
                         prefix="+91"
                         suffix={<SearchOutlined />}
                         maxLength={15}
@@ -202,6 +214,7 @@ const Customers = () => {
                             form.resetFields();
                             setPopModal(true);
                         }}
+                        style={{ width: isMobile ? '100%' : 'auto' }}
                     >
                         Add Customer
                     </Button>
@@ -212,10 +225,12 @@ const Customers = () => {
                 dataSource={searchPhone ? searchResults : customersData}
                 columns={columns}
                 bordered
-                pagination={false}
+                pagination={{ pageSize: isMobile ? 5 : 10 }}
                 locale={{
                     emptyText: searchPhone ? 'No matching customers found' : 'No customers available',
                 }}
+                scroll={isMobile ? { x: '100%' } : undefined}
+                size={isMobile ? "small" : "middle"}
             />
 
             <Modal
@@ -227,6 +242,7 @@ const Customers = () => {
                     form.resetFields();
                 }}
                 footer={false}
+                width={isMobile ? '95%' : 520}
             >
                 <Form layout="vertical" onFinish={handlerSubmit} form={form} initialValues={editCustomer}>
                     <FormItem name="name" label="Customer Name" rules={[{ required: true, message: 'Please enter customer name' }]}>

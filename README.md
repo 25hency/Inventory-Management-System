@@ -29,7 +29,8 @@ A comprehensive solution for businesses to manage inventory, track sales, and an
 
 ## Screenshots
 
-*Screenshots will go here*
+![alt text](screencapture-localhost-3000-2025-04-28-18_13_18.png)
+![alt text](screencapture-localhost-3000-products-2025-04-28-18_13_32.png)
 
 ## Installation
 

@@ -12,6 +12,7 @@ const Bills = () => {
     const [billsData, setBillsData] = useState([]);
     const [popModal, setPopModal] = useState(false);
     const [selectedBill, setSelectedBill] = useState(null);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
 
     const getAllBills = async () => {
         try {
@@ -36,10 +37,21 @@ const Bills = () => {
         getAllBills();
     }, []);
 
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 576);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const columns = [
         {
             title: 'ID',
             dataIndex: '_id',
+            ellipsis: true,
+            responsive: ['md'],
         },
         {
             title: 'Customer Name',
@@ -53,19 +65,10 @@ const Bills = () => {
         {
             title: 'Customer Address',
             dataIndex: 'customerAddress',
+            responsive: ['lg'],
         },
         {
-            title: 'Sub Total',
-            dataIndex: 'subTotal',
-            render: subTotal => <span>₹{subTotal}</span>
-        },
-        {
-            title: 'Tax',
-            dataIndex: 'tax',
-            render: tax => <span>₹{tax}</span>
-        },
-        {
-            title: 'Total Amount',
+            title: 'Amount',
             dataIndex: 'totalAmount',
             render: total => <span>₹{total}</span>
         },
@@ -93,10 +96,24 @@ const Bills = () => {
     return (
         <Layout>
             <h2>All Invoice </h2>
-            <Table dataSource={billsData} columns={columns} bordered />
+            <Table 
+                dataSource={billsData} 
+                columns={columns} 
+                bordered 
+                scroll={isMobile ? { x: '100%' } : undefined}
+                size={isMobile ? "small" : "middle"}
+                pagination={{ pageSize: isMobile ? 5 : 10 }}
+            />
 
             {popModal && (
-                <Modal title="Invoice Details" width={400} pagination={false} visible={popModal} onCancel={() => setPopModal(false)} footer={false}>
+                <Modal 
+                    title="Invoice Details" 
+                    width={isMobile ? '95%' : 400} 
+                    pagination={false} 
+                    visible={popModal} 
+                    onCancel={() => setPopModal(false)} 
+                    footer={false}
+                >
                     <div className="card" ref={componentRef}>
                         <div className="cardHeader">
                             <h2 className="logo">Home System</h2>

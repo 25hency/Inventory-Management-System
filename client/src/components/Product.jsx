@@ -22,7 +22,25 @@ const Product = ({ product }) => {
     const { Meta } = Card;
 
     return (
-        <Card hoverable style={{ width: 240, marginBottom: 30 }} cover={<img alt={product.name} src={product.image} style={{ height: 200 }} />}>
+        <Card 
+            hoverable 
+            style={{ 
+                width: '100%', 
+                marginBottom: 20,
+                maxWidth: 300
+            }} 
+            cover={
+                <img 
+                    alt={product.name} 
+                    src={product.image} 
+                    style={{ 
+                        height: 180, 
+                        objectFit: 'cover',
+                        width: '100%' 
+                    }} 
+                />
+            }
+        >
             <Meta title={product.name} />
             <Meta title={`Price: ₹${product.price}`} />
             <p>Stock: {product?.stock < 10 ? <span style={{ color: 'red' }}>{product.stock}</span> : <span style={{ color: 'green' }}>{product.stock}</span>}</p>

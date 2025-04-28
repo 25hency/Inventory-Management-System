@@ -1,7 +1,29 @@
-.empty-cart {
-    text-align: center;
-    margin: 0 auto;
+/* Responsive styles for cart */
+@media screen and (max-width: 768px) {
+    .subTotal {
+        margin-top: 20px;
+        text-align: center;
+    }
+    
+    .subTotal h2 {
+        font-size: 18px;
+    }
 }
-.empty-text {
-    color: #ff7f50;
+
+@media screen and (max-width: 576px) {
+    .cart-quantity {
+        font-size: 16px;
+    }
+    
+    .ant-modal-body .form-group input {
+        width: 100%;
+    }
+    
+    .total {
+        font-size: 14px;
+    }
+    
+    .total h3 {
+        font-size: 16px;
+    }
 }

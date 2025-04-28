@@ -14,8 +14,18 @@ const Home = () => {
         categoryDistribution: [],
         topProducts: []
     });
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
 
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 576);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const getAllProducts = async () => {
         try {
@@ -67,10 +77,10 @@ const Home = () => {
                 </div>
             ) : (
                 <>
-                    <div>
-                        <Row>
+                    <div className="products-container">
+                        <Row gutter={[16, 16]} style={{ width: '100%' }}>
                             {productData?.map(product => (
-                                <Col xs={24} sm={6} md={6} lg={6} key={product._id}>
+                                <Col xs={24} sm={12} md={8} lg={6} key={product._id} style={{ display: 'flex', justifyContent: 'center' }}>
                                     <Product product={product} />
                                 </Col>
                             ))}
@@ -82,17 +92,17 @@ const Home = () => {
                         <Row gutter={[16, 16]}>
                             <Col xs={24} md={12}>
                                 <Card title="Category Distribution">
-                                    <ResponsiveContainer width="100%" height={300}>
+                                    <ResponsiveContainer width="100%" height={isMobile ? 250 : 300}>
                                         <PieChart>
                                             <Pie
                                                 data={analyticsData.categoryDistribution}
                                                 cx="50%"
                                                 cy="50%"
-                                                labelLine={false}
-                                                outerRadius={80}
+                                                labelLine={!isMobile}
+                                                outerRadius={isMobile ? 60 : 80}
                                                 fill="#8884d8"
                                                 dataKey="value"
-                                                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                                label={isMobile ? null : ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                                             >
                                                 {analyticsData.categoryDistribution.map((entry, index) => (
                                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -106,10 +116,10 @@ const Home = () => {
                             </Col>
                             <Col xs={24} md={12}>
                                 <Card title="Top Selling Products">
-                                    <ResponsiveContainer width="100%" height={300}>
+                                    <ResponsiveContainer width="100%" height={isMobile ? 250 : 300}>
                                         <BarChart data={analyticsData.topProducts}>
                                             <CartesianGrid strokeDasharray="3 3" />
-                                            <XAxis dataKey="name" />
+                                            <XAxis dataKey="name" tick={!isMobile} />
                                             <YAxis />
                                             <Tooltip />
                                             <Legend />

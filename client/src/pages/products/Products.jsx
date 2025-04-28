@@ -16,6 +16,16 @@ const Products = () => {
         const auth = localStorage.getItem('auth');
         return auth ? JSON.parse(auth)._id : null;
     });
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 576);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         const auth = localStorage.getItem('auth');
@@ -93,6 +103,7 @@ const Products = () => {
             title: 'Image',
             dataIndex: 'image',
             render: (image, record) => <img src={image} alt={record.name} height={60} width={60} />,
+            responsive: ['md'],
         },
         {
             title: 'Price',
@@ -119,8 +130,9 @@ const Products = () => {
                             message.success('Added to cart');
                         }}
                         style={{ marginRight: '10px' }}
+                        size={isMobile ? "small" : "middle"}
                     >
-                        Add to Cart
+                        {!isMobile ? 'Add to Cart' : 'Add'}
                     </Button>
                     <EditOutlined
                         className="cart-edit"
@@ -229,6 +241,7 @@ const Products = () => {
                                     ]}
                                     pagination={false}
                                     size="small"
+                                    scroll={isMobile ? { x: '100%' } : undefined}
                                 />
                             ) : (
                                 <Alert message="No low stock items" type="success" showIcon />
@@ -245,13 +258,14 @@ const Products = () => {
                                 ]}
                                 pagination={false}
                                 size="small"
+                                scroll={isMobile ? { x: '100%' } : undefined}
                             />
                         </Card>
                     </Col>
                 </Row>
             </div>
 
-            <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="d-flex justify-content-between align-items-center mb-4" style={{ flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '10px' : '0' }}>
                 <h2>All Products</h2>
                 <Button
                     className="add-new"
@@ -268,10 +282,12 @@ const Products = () => {
                 dataSource={productData}
                 columns={columns}
                 bordered
-                pagination={false}
+                pagination={{ pageSize: isMobile ? 5 : 10 }}
                 locale={{
                     emptyText: 'No products available',
                 }}
+                scroll={isMobile ? { x: '100%' } : undefined}
+                size={isMobile ? "small" : "middle"}
             />
 
             {popModal && (

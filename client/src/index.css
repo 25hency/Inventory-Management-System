@@ -293,3 +293,50 @@ body {
     margin: 0 auto;
     text-align: center;
 }
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+    .form-group input {
+        width: 100%;
+    }
+
+    .ant-layout-header {
+        padding: 0 10px;
+    }
+
+    .cart-items {
+        margin-right: 15px;
+    }
+
+    .cart-badge {
+        right: -15px;
+    }
+    
+    .categoryFlex {
+        margin: 0 10px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .form {
+        padding: 0 15px;
+    }
+    
+    .categoryName {
+        font-size: 12px;
+    }
+    
+    .form-group {
+        width: 100%;
+    }
+    
+    .footerCard .group,
+    .cardBody .group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .ant-layout-header .anticon svg {
+        font-size: 24px;
+    }
+}

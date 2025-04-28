@@ -1,5 +1,7 @@
 import {
     LogoutOutlined,
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
     MoneyCollectOutlined,
     ShopOutlined,
     ShoppingCartOutlined,
@@ -7,7 +9,7 @@ import {
     UserSwitchOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu } from 'antd';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import brandLogo from '../asset/images/brand-logo.png';
@@ -19,18 +21,45 @@ const { Header, Sider, Content } = Layout;
 const LayoutApp = ({ children }) => {
     const { cartItems, loading } = useSelector(state => state.rootReducer);
     const navigate = useNavigate();
+    const [collapsed, setCollapsed] = useState(window.innerWidth < 576);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 576);
 
     useEffect(() => {
         localStorage.setItem('cartItems', JSON.stringify(cartItems));
     }, [cartItems]);
 
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 576);
+            if (window.innerWidth >= 576) {
+                setCollapsed(false);
+            } else {
+                setCollapsed(true);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const toggleSidebar = () => {
+        setCollapsed(!collapsed);
+    };
+
     return (
         <Layout>
             {loading && <Spinner />}
-            <Sider>
+            <Sider 
+                collapsible 
+                collapsed={collapsed} 
+                trigger={null}
+                collapsedWidth={isMobile ? 0 : 80}
+                breakpoint="lg"
+                style={isMobile ? { position: 'fixed', height: '100%', zIndex: 999 } : {}}
+            >
                 <div className="logo">
                     <img src={brandLogo} alt="brand-logo" className="brand-logo" />
-                    <h4 className="logo-title">Inventory Management</h4>
+                    {!collapsed && <h4 className="logo-title">Inventory Management</h4>}
                 </div>
                 <Menu theme="dark" mode="inline" defaultSelectedKeys={window.location.pathname}>
                     <Menu.Item key="/" icon={<ShoppingOutlined />}>
@@ -59,6 +88,11 @@ const LayoutApp = ({ children }) => {
             </Sider>
             <Layout className="site-layout">
                 <Header className="site-layout-background">
+                    {isMobile && (
+                        <div className="mobile-menu-button" onClick={toggleSidebar}>
+                            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                        </div>
+                    )}
                     <div className="cart-items" onClick={() => navigate('/cart')}>
                         <ShoppingCartOutlined />
                         <span className="cart-badge">{cartItems.length}</span>
@@ -67,8 +101,8 @@ const LayoutApp = ({ children }) => {
                 <Content
                     className="site-layout-background"
                     style={{
-                        margin: '24px 16px',
-                        padding: 24,
+                        margin: isMobile ? '12px 8px' : '24px 16px',
+                        padding: isMobile ? 12 : 24,
                         minHeight: 280,
                     }}
                 >
